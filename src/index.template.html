@@ -2,22 +2,78 @@
 <html lang="en">
   <head>
     <title>{{ title }}</title>
-    <meta charset="utf-8">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <link rel="apple-touch-icon" sizes="120x120" href="/public/logo-120.png">
-    <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
-    <link rel="shortcut icon" sizes="48x48" href="/public/logo-48.png">
-    <meta name="theme-color" content="#f60">
-    <link rel="manifest" href="/manifest.json">
+    <meta charset="utf-8" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <link rel="apple-touch-icon" sizes="120x120" href="/public/logo-120.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui" />
+    <link rel="shortcut icon" sizes="48x48" href="/public/logo-48.png" />
+    <meta name="theme-color" content="#f60" />
+    <link rel="manifest" href="/manifest.json" />
+    <script>
+      window.CustomEvent =
+        window.CustomEvent ||
+        (function() {
+          function CustomEvent(event, params) {
+            params = params || {
+              bubbles: false,
+              cancelable: false,
+              detail: undefined,
+            };
+            var evt = document.createEvent("CustomEvent");
+            evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+            return evt;
+          }
+          CustomEvent.prototype = window.Event.prototype;
+          return CustomEvent;
+        })();
+      function lxDispatch(obj, type, data = null) {
+        try {
+          var event = new CustomEvent(type, {
+            bubbles: false,
+            cancelable: false,
+            detail: data,
+          });
+          if (obj.dispatchEvent) {
+            obj.dispatchEvent(event);
+          } else if (obj.fireEvent) {
+            obj.fireEvent(event);
+          }
+        } catch (ex) {
+          console.error(`dispatch event ${type} error`, ex);
+        }
+      }
+      window.addEventListener("vueLoaded", function(event) {
+        var Vue = event.detail;
+        Vue.mixin({
+          methods: {
+            hello: function() {
+              console.log("hello world from global mixin");
+            },
+          },
+        });
+      });
+    </script>
+
     <style>
-      #skip a {  position:absolute;  left:-10000px;  top:auto;  width:1px;  height:1px;  overflow:hidden;  }
-      #skip a:focus {  position:static;  width:auto;  height:auto;  }
+      #skip a {
+        position: absolute;
+        left: -10000px;
+        top: auto;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+      }
+      #skip a:focus {
+        position: static;
+        width: auto;
+        height: auto;
+      }
     </style>
   </head>
   <body>
-  <div id="skip"><a href="#app">skip to content</a></div>
-  <!--vue-ssr-outlet-->
+    <div id="skip"><a href="#app">skip to content</a></div>
+    <!--vue-ssr-outlet-->
   </body>
 </html>
